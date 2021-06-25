@@ -29,7 +29,7 @@ const names = [
 ];
 
 function pick() {
-	return new Chance().pickone(names);
+  return new Chance().pickone(names);
 }
 
 module.exports = { pick };

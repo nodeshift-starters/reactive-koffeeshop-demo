@@ -29,14 +29,14 @@ const consumer = kafka.consumer({ groupId: 'baristas' });
 
 const run = async () => {
   await consumer.connect();
-	await producer.connect();
+  await producer.connect();
   await consumer.subscribe({ topic: 'orders', fromBeginning: true });
   await consumer.run({
     eachMessage: async ({ message }) => {
       const order = JSON.parse(message.value.toString());
       const beverage = await prepare(order);
       logger.info(`Order ${order.id} for ${order.name} is ready`);
-			const msg = { value: JSON.stringify({ ...beverage })};
+      const msg = { value: JSON.stringify({ ...beverage }) };
       await producer.send({
         topic: 'queue',
         messages: [msg],

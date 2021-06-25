@@ -4,7 +4,7 @@ const State = Object.freeze({
   READY: Symbol('READY'),
 });
 
-function Beverage (order, baristaName, state) {
+function Beverage(order, baristaName, state) {
   this.beverage = order.product;
   this.customer = order.name;
   this.orderId = order.id;
