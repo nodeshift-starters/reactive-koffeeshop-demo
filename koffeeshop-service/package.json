@@ -1,0 +1,17 @@
+{
+  "name": "koffeeshop-service",
+  "version": "1.0.0",
+  "description": "A clone of https://github.com/cescoffier/reactive-coffeeshop-demo in JS",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Red Hat, Inc.",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "fastify": "^3.18.1",
+    "fastify-sse-v2": "^2.0.6",
+    "fastify-static": "^4.2.2",
+    "uuid": "^8.3.2"
+  }
+}
