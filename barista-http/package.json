@@ -1,5 +1,5 @@
 {
-  "name": "koffeeshop-service",
+  "name": "barista-http",
   "version": "1.0.0",
   "description": "A clone of https://github.com/cescoffier/reactive-coffeeshop-demo in JS",
   "main": "index.js",
@@ -11,11 +11,7 @@
   "author": "Red Hat, Inc.",
   "license": "Apache-2.0",
   "dependencies": {
-    "axios": "^0.21.1",
     "fastify": "^3.18.1",
-    "fastify-sse-v2": "^2.0.6",
-    "fastify-static": "^4.2.2",
-    "nanoid": "^3.1.23",
     "pino-pretty": "^5.1.1"
   },
   "devDependencies": {
