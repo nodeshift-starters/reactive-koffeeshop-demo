@@ -2,6 +2,8 @@ const pino = require('pino');
 const { Kafka } = require('kafkajs');
 const Beverage = require('./models/beverage');
 
+require('dotenv').config();
+
 const logger = pino({
   prettyPrint: true
 });

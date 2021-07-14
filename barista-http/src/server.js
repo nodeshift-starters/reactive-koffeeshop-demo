@@ -6,8 +6,6 @@ const fastify = Fastify({ logger: { prettyPrint: true } });
 fastify.post('/', async (request, reply) => {
   const order = request.body;
   const beverage = await Beverage.prepare(order);
-
-  console.log(`Order ${order.orderId} for ${order.name} is ready`);
   reply.send(beverage);
 });
 

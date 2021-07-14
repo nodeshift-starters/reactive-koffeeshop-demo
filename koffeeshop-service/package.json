@@ -12,6 +12,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
     "fastify": "^3.18.1",
     "fastify-sse": "^1.0.0",
     "fastify-static": "^4.2.2",

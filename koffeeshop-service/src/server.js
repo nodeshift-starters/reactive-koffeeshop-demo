@@ -8,6 +8,8 @@ const axios = require('axios');
 
 const { createFallbackBeverage, inQueue } = require('./models/beverage');
 
+require('dotenv').config();
+
 const fastify = Fastify({ logger: { prettyPrint: true } });
 
 fastify.register(require('fastify-static'), {
@@ -38,18 +40,18 @@ const producer = kafka.producer(); // orders
 const consumer = kafka.consumer({ groupId: 'koffeeshop' }); // beverages
 
 fastify.get('/queue', (_, reply) => {
-  queue.on('beverage', (data) => {
+  queue.on('update', (data) => {
     reply.sse(data);
   });
 });
 
 fastify.post('/messaging', (request, reply) => {
   const order = { orderId: nanoid(), ...request.body };
-  queue.emit('beverage', inQueue(order));
   producer.send({
     topic: 'orders',
     messages: [{ value: JSON.stringify({ ...order }) }]
   });
+  queue.emit('update', inQueue(order));
   reply.send(order);
 });
 
@@ -73,7 +75,7 @@ const start = async () => {
   consumer.run({
     eachMessage: ({ message }) => {
       const beverage = JSON.parse(message.value.toString());
-      queue.emit('beverage', beverage);
+      queue.emit('update', beverage);
     }
   });
 };
