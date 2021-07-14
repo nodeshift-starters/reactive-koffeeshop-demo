@@ -152,8 +152,8 @@
 
     function line(order) {
         const id = order.orderId;
-        const product = order.beverage;
-        const customer = order.customer;
+        const product = order.product;
+        const customer = order.name;
         let barista = "";
         if (order.preparedBy) {
             barista = order.preparedBy;

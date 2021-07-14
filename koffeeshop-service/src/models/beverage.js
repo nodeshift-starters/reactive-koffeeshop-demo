@@ -5,6 +5,13 @@ const state = {
   FAILED: 'FAILED'
 };
 
+function inQueue(order) {
+  return {
+    ...order,
+    preparationState: state.IN_QUEUE
+  };
+}
+
 function createFallbackBeverage(order) {
   return {
     ...order,
@@ -13,5 +20,6 @@ function createFallbackBeverage(order) {
 }
 
 module.exports = {
-  createFallbackBeverage
+  createFallbackBeverage,
+  inQueue
 };

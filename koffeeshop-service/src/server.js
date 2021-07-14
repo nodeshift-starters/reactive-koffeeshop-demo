@@ -1,10 +1,12 @@
 const path = require('path');
+const { EventEmitter } = require('events');
 const Fastify = require('fastify');
-const FastifySSEPlugin = require('fastify-sse-v2');
-const axios = require('axios');
+const FastifySSEPlugin = require('fastify-sse');
 const { nanoid } = require('nanoid');
+const { Kafka } = require('kafkajs');
+const axios = require('axios');
 
-const { createFallbackBeverage } = require('./models/beverage');
+const { createFallbackBeverage, inQueue } = require('./models/beverage');
 
 const fastify = Fastify({ logger: { prettyPrint: true } });
 
@@ -19,26 +21,61 @@ fastify.post('/http', async (request, reply) => {
   const order = { orderId: nanoid(), ...request.body };
   try {
     const response = await axios.post('http://localhost:8081', order);
-    console.log('DEBUG =>', response);
     reply.send(response.data);
   } catch (err) {
     reply.send(createFallbackBeverage(order));
   }
 });
 
-// fastify.get('/queue', (request, reply) => {
-//   console.log(request.body);
-//   reply.sse('ok');
-// });
-
-// fastify.post('/messaging', (request, reply) => {
-//   console.log(request.body);
-//   reply.send('Hello!');
-// });
-
-fastify.listen(8080, '0.0.0.0', (err) => {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
+const kafka = new Kafka({
+  clientId: 'koffeeshop-services',
+  brokers: [process.env.KAFKA_BOOTSTRAP_SERVER || 'localhost:9092']
 });
+
+const queue = new EventEmitter();
+
+const producer = kafka.producer(); // orders
+const consumer = kafka.consumer({ groupId: 'koffeeshop' }); // beverages
+
+fastify.get('/queue', (_, reply) => {
+  queue.on('beverage', (data) => {
+    reply.sse(data);
+  });
+});
+
+fastify.post('/messaging', (request, reply) => {
+  const order = { orderId: nanoid(), ...request.body };
+  queue.emit('beverage', inQueue(order));
+  producer.send({
+    topic: 'orders',
+    messages: [{ value: JSON.stringify({ ...order }) }]
+  });
+  reply.send(order);
+});
+
+const start = async () => {
+  // connect the consumer and producer instances to Kafka
+  await consumer.connect();
+  await producer.connect();
+
+  // subscribe to the `queue` topic
+  await consumer.subscribe({ topic: 'queue', fromBeginning: true });
+
+  // start the fastify server
+  fastify.listen(8080, '0.0.0.0', async (err) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+  });
+
+  // start listening for kafka messages
+  consumer.run({
+    eachMessage: ({ message }) => {
+      const beverage = JSON.parse(message.value.toString());
+      queue.emit('beverage', beverage);
+    }
+  });
+};
+
+start();
