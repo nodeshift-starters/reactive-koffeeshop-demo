@@ -2,16 +2,27 @@
   "name": "barista-kafka",
   "version": "1.0.0",
   "description": "A clone of https://github.com/cescoffier/reactive-coffeeshop-demo in JS",
-  "main": "kafka-barista.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node .",
+    "lint": "eslint ."
   },
-	"author": "Red Hat, Inc.",
-	"license": "Apache-2.0",
+  "author": "Red Hat, Inc.",
+  "license": "Apache-2.0",
   "dependencies": {
     "chance": "^1.1.7",
+    "dotenv": "^10.0.0",
     "kafkajs": "^1.15.0",
     "pino": "^6.11.3",
     "pino-pretty": "^5.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.0.1",
+    "eslint-config-semistandard": "^15.0.1",
+    "eslint-config-standard": "^14.0.0",
+    "eslint-plugin-import": "~2.22.1",
+    "eslint-plugin-node": "~11.1.0",
+    "eslint-plugin-promise": "~4.3.1",
+    "eslint-plugin-standard": "^4.1.0"
   }
 }
