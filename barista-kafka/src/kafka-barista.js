@@ -1,5 +1,5 @@
 const pino = require('pino');
-const { Kafka } = require('kafkajs');
+const Kafka = require('node-rdkafka');
 const Beverage = require('./models/beverage');
 
 require('dotenv').config();
@@ -8,42 +8,66 @@ const logger = pino({
   prettyPrint: true
 });
 
-const kafka = new Kafka({
-  clientId: 'barista-kafka-node',
-  brokers: [process.env.KAFKA_BOOTSTRAP_SERVER || 'localhost:9092']
+const consumer = new Kafka.KafkaConsumer(
+  {
+    'group.id': 'baristas',
+    'metadata.broker.list':
+      process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092',
+    'enable.auto.commit': true
+  },
+  {
+    'auto.offset.reset': 'earliest'
+  }
+);
+
+const producer = new Kafka.Producer({
+  'client.id': 'barista-kafka-node',
+  'metadata.broker.list':
+    process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092'
 });
 
-const producer = kafka.producer();
-const consumer = kafka.consumer({ groupId: 'baristas' });
+consumer.on('ready', () => {
+  logger.info('Consumer connected to kafka cluster');
+  consumer.subscribe(['orders']);
+  consumer.consume();
+});
 
-const run = async () => {
-  // connect the consumer adn producer instances to Kafka
-  await consumer.connect();
-  await producer.connect();
+producer.on('ready', () => {
+  logger.info('Producer connected to kafka cluster');
+});
 
-  // subscribe consumer to the `orders` topic
-  await consumer.subscribe({ topic: 'orders', fromBeginning: true });
+consumer.on('data', async (message) => {
+  // get the order from kafka and prepare the beverage
+  const order = JSON.parse(message.value.toString());
+  const beverage = await Beverage.prepare(order);
 
-  // start listening for messages
-  await consumer.run({
-    eachMessage: async ({ message }) => {
-      // get the order from kafka and prepare the beverage
-      const order = JSON.parse(message.value.toString());
-      const beverage = await Beverage.prepare(order);
+  // debug statement
+  logger.info(`Order ${order.orderId} for ${order.name} is ready`);
 
-      // debug statement
-      logger.info(`Order ${order.orderId} for ${order.name} is ready`);
+  try {
+    producer.produce(
+      'queue',
+      null,
+      Buffer.from(JSON.stringify({ ...beverage })),
+      null,
+      Date.now()
+    );
+  } catch (err) {
+    logger.error(err);
+  }
+});
 
-      // create a kafka-message from a JS object and send it to kafka
-      await producer.send({
-        topic: 'queue',
-        messages: [{ value: JSON.stringify({ ...beverage }) }]
-      });
-    }
-  });
-};
+// without this, we do not get delivery events and the queue
+producer.setPollInterval(100);
 
-run().catch((err) => logger.error(err));
+// subscribe to error events
+producer.on('connection.failure', (err) => {
+  logger.error(err.message);
+});
 
-process.once('SIGINT', consumer.disconnect);
-process.once('SIGINT', producer.disconnect);
+consumer.on('connection.failure', (err) => {
+  logger.error(err.message);
+});
+
+consumer.connect();
+producer.connect();
