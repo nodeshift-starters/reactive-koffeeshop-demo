@@ -29,16 +29,24 @@ const producer = new Kafka.Producer({
 consumer.on('ready', () => {
   logger.info('Consumer connected to kafka cluster');
   consumer.subscribe(['orders']);
-  consumer.consume();
+  consumer.consume(1, consumeNextMessage);
 });
 
 producer.on('ready', () => {
   logger.info('Producer connected to kafka cluster');
 });
 
-consumer.on('data', async (message) => {
+const consumeNextMessage = async (_, messages) => {
+  // if no messages recheck in 250 milliseconds
+  if (!messages.length) {
+    setTimeout(() => {
+      consumer.consume(1, consumeNextMessage);
+    }, 250);
+    return;
+  }
+
   // get the order from kafka and prepare the beverage
-  const order = JSON.parse(message.value.toString());
+  const order = JSON.parse(messages[0].value.toString());
   const beverage = await Beverage.prepare(order);
 
   // debug statement
@@ -55,7 +63,10 @@ consumer.on('data', async (message) => {
   } catch (err) {
     logger.error(err);
   }
-});
+
+  // pull next message immediately
+  consumer.consume(1, consumeNextMessage);
+};
 
 // without this, we do not get delivery events and the queue
 producer.setPollInterval(100);
