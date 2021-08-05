@@ -1,79 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Queue</title>
 
     <link rel="stylesheet" type="text/css"
-          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
     <link rel="stylesheet" type="text/css"
-          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
 </head>
+
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <h1>Order</h1>
+        <h1>Order</h1>
 
-    <form id="orderForm" class="form-horizontal">
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="customerName">Name</label>
-            <div class="col-md-6">
-                <input type="text" id="customerName" class="form-control">
+        <form id="orderForm" class="form-horizontal">
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="customerName">Name</label>
+                <div class="col-md-6">
+                    <input type="text" id="customerName" class="form-control">
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="orderMethod">Order method</label>
-            <div class="col-md-10">
-                <select id="orderMethod">
-                    <option value="http">HTTP</option>
-                    <option value="messaging">Messaging / Kafka</option>
-                </select>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="orderMethod">Order method</label>
+                <div class="col-md-10">
+                    <select id="orderMethod">
+                        <option value="http">HTTP</option>
+                        <option value="messaging">Messaging / Kafka</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="product">Product</label>
-            <div class="col-md-10">
-                <select id="product">
-                    <option value="frappuccino">Frappuccino</option>
-                    <option value="chai">Chai</option>
-                    <option value="hot-chocolate">Hot Chocolate</option>
-                    <option value="latte">Latte</option>
-                    <option value="espresso">Espresso</option>
-                    <option value="mocha">Mocha</option>
-                </select>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="product">Product</label>
+                <div class="col-md-10">
+                    <select id="product">
+                        <option value="frappuccino">Frappuccino</option>
+                        <option value="chai">Chai</option>
+                        <option value="hot-chocolate">Hot Chocolate</option>
+                        <option value="latte">Latte</option>
+                        <option value="espresso">Espresso</option>
+                        <option value="mocha">Mocha</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-10 col-md-offset-2">
-                <button id="order-button" type="submit" class="btn btn-primary">Place order</button>
+            <div class="form-group">
+                <div class="col-md-10 col-md-offset-2">
+                    <button id="order-button" type="submit" class="btn btn-primary">Place order</button>
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
 
-</div>
+    </div>
 
-<div class="container" id="order-result-message"></div>
+    <div class="container" id="order-result-message"></div>
 
-<div class="container">
+    <div class="container">
 
-    <h1>Queue</h1>
+        <h1>Queue</h1>
 
-    <table class="table table-striped">
-        <thead class="thead-dark">
-        <tr>
-            <th>Customer</th>
-            <th>Product</th>
-            <th>Prepared By</th>
-            <th>State</th>
-        </tr>
-        </thead>
-        <tbody>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Prepared By</th>
+                    <th>State</th>
+                </tr>
+            </thead>
+            <tbody>
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-</div>
+    </div>
 
 
 
@@ -86,7 +88,7 @@
 
 <script>
 
-    $("#orderForm").submit(function(event){
+    $("#orderForm").submit(function (event) {
         const method = $("#orderMethod option:selected").val();
         const order = {
             name: $("#customerName").val(),
@@ -94,7 +96,7 @@
         };
         console.log("Customer name = " + order.name);
 
-        if(method==="http") {
+        if (method === "http") {
             const state = {
                 customer: order.name,
                 beverage: order.product,
@@ -107,15 +109,15 @@
         event.preventDefault();
         const post_url = "/" + method; //get form action url
         const request_method = "POST"; //get form GET/POST method
-        
+
         $.ajax({
-            url : post_url,
+            url: post_url,
             type: request_method,
-            data : JSON.stringify(order),
+            data: JSON.stringify(order),
             contentType: 'application/json',
             cache: false
-        }).done(function(response){
-            if(method==="http") {
+        }).done(function (response) {
+            if (method === "http") {
                 const state = {
                     orderId: response.orderId,
                     customer: order.name,
@@ -126,7 +128,7 @@
                 $('tbody tr:first').replaceWith(line(state));
                 $("#order-button").removeClass("disabled").removeAttr("disabled");
             }
-        }).fail(function(err) {
+        }).fail(function (err) {
             $("#order-result-message").append("<div class='alert alert-danger alert-dismissable'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span class='pficon pficon-close'></span></button><span class='pficon pficon-error-circle-o'></span><strong>Error</strong>" + err.responseText + "</div>");
             $('tbody tr:last').remove();
             $("#order-button").removeClass("disabled").removeAttr("disabled");
@@ -136,24 +138,24 @@
 
     $(function () {
         const source = new EventSource("/queue");
-        source.onmessage = function(e) {
+        source.onmessage = function (e) {
             if (e.data === "{}") {
                 return;
             }
             console.log(e);
             const beverage = JSON.parse(e.data);
-            if(beverage.preparationState==="IN_QUEUE")
+            if (beverage.preparationState === "IN_QUEUE")
                 $("tbody").prepend(line(beverage));
-            if(beverage.preparationState==="READY")
-                $("#"+beverage.orderId).replaceWith(line(beverage));
-            
+            if (beverage.preparationState === "READY")
+                $("#" + beverage.orderId).replaceWith(line(beverage));
+
         };
     });
 
     function line(order) {
         const id = order.orderId;
-        const product = order.product;
-        const customer = order.name;
+        const product = order.beverage;
+        const customer = order.customer;
         let barista = "";
         if (order.preparedBy) {
             barista = order.preparedBy;
@@ -167,4 +169,5 @@
 
 
 </script>
+
 </html>
