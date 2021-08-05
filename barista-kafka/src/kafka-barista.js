@@ -26,18 +26,16 @@ const run = async () => {
 
   // start listening for messages
   await consumer.run({
-    partitionsConsumedConcurrently: 4,
     eachMessage: async ({ message }) => {
       // get the order from kafka and prepare the beverage
       const order = JSON.parse(message.value.toString());
-      Beverage.prepare(order).then((beverage) => {
-        // debug statement
-        logger.info(`Order ${order.orderId} for ${order.name} is ready`);
-        // create a kafka-message from a JS object and send it to kafka
-        producer.send({
-          topic: 'queue',
-          messages: [{ value: JSON.stringify({ ...beverage }) }]
-        });
+      const beverage = await Beverage.prepare(order);
+      // debug statement
+      logger.info(`Order ${order.orderId} for ${order.customer} is ready`);
+      // create a kafka-message from a JS object and send it to kafka
+      producer.send({
+        topic: 'queue',
+        messages: [{ value: JSON.stringify({ ...beverage }) }]
       });
     }
   });
