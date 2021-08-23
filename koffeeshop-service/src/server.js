@@ -20,7 +20,8 @@ fastify.register(FastifySSEPlugin);
 
 fastify.post('/http', async (request, reply) => {
   // if we get an order through http just forward it to the barista-http-services
-  const order = { orderId: nanoid(), ...request.body };
+  const { name, product } = request.body;
+  const order = { orderId: nanoid(), customer: name, beverage: product };
   try {
     const response = await axios.post('http://localhost:8081', order);
     reply.send(response.data);
@@ -59,7 +60,8 @@ fastify.get('/queue', (_, reply) => {
 });
 
 fastify.post('/messaging', (request, reply) => {
-  const order = { orderId: nanoid(), ...request.body };
+  const { name, product } = request.body;
+  const order = { orderId: nanoid(), customer: name, beverage: product };
   producer.produce(
     'orders',
     null,
