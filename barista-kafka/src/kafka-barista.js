@@ -37,7 +37,13 @@ producer.on('ready', () => {
 });
 
 const consumeNextMessage = async (_, messages) => {
-  // if no messages recheck in 250 milliseconds
+  // if no messages recheck in 250 milliseconds. We want to simulate the barista only being
+  // able to fill one coffee order at a time. By default, node with node-rdkafka will process
+  // all available messages in parallel which it can easily do since Node.js can easily run
+  // many async tasks at the same time. For this example though, we want to simulate only
+  // being able to do one thing at a time so we need to use the the API that allows us to avoid
+  // processing the messages in parallel and this in turn requires that we check for new messages
+  // a periodic basis. We choose 250ms to avoid consuming all available CPU in a tight loop.
   if (!messages.length) {
     setTimeout(() => {
       consumer.consume(1, consumeNextMessage);
