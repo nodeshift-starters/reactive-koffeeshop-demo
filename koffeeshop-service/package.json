@@ -4,13 +4,21 @@
   "description": "A clone of https://github.com/cescoffier/reactive-coffeeshop-demo in JS",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
+    "start": "NODE_OPTIONS='--require ./tracing.js' node .",
     "dev": "nodemon src/server.js",
     "lint": "eslint ."
   },
   "author": "Red Hat, Inc.",
   "license": "Apache-2.0",
   "dependencies": {
+    "@opentelemetry/api": "^1.2.0",
+    "@opentelemetry/instrumentation": "^0.32.0",
+    "@opentelemetry/instrumentation-fastify": "^0.30.0",
+    "@opentelemetry/instrumentation-http": "^0.33.0",
+    "@opentelemetry/resources": "^1.6.0",
+    "@opentelemetry/sdk-trace-base": "^1.6.0",
+    "@opentelemetry/sdk-trace-node": "^1.6.0",
+    "@opentelemetry/semantic-conventions": "^1.6.0",
     "axios": "^0.23.0",
     "dotenv": "^10.0.0",
     "fastify": "^3.18.1",
