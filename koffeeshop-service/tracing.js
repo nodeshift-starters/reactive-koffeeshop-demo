@@ -5,6 +5,7 @@ const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { trace } = require('@opentelemetry/api');
 const { FastifyInstrumentation } = require('@opentelemetry/instrumentation-fastify');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+const { KafkaJsInstrumentation } = require('opentelemetry-instrumentation-kafkajs');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
 const exporter = new ConsoleSpanExporter();
@@ -22,7 +23,8 @@ provider.register();
 registerInstrumentations({
   instrumentations: [
     new HttpInstrumentation(),
-    new FastifyInstrumentation()
+    new FastifyInstrumentation(),
+    new KafkaJsInstrumentation()
   ],
   tracerProvider: provider
 });
