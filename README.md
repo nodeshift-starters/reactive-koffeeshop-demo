@@ -48,3 +48,9 @@ Open a new terminal and
 cd barista-kafka
 npm start
 ```
+
+Open in your browser:
+
+* [Barista HTTP](http://localhost:8081)
+* [Koffeeshop Service](http://localhost:8080)
+
