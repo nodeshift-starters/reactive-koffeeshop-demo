@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_OPTIONS='--require ./tracing.js' node .",
-    "lint": "eslint ."
+    "lint": "eslint --fix ."
   },
   "author": "Red Hat, Inc.",
   "license": "Apache-2.0",

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_OPTIONS='--require ./tracing.js' node .",
     "dev": "nodemon src/server.js",
-    "lint": "eslint ."
+    "lint": "eslint --fix ."
   },
   "author": "Red Hat, Inc.",
   "license": "Apache-2.0",
