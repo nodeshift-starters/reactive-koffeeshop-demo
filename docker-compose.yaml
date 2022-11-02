@@ -19,7 +19,7 @@ services:
       "sh", "-c",
       "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}",
       "bin/kafka-topics.sh --bootstrap-server kafka:9092 --list",
-      "bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic orders --replication-factor 1 --partitions 1"
+      "bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic orders --replication-factor 1 --partitions 4"
     ]
     depends_on:
       - zookeeper
