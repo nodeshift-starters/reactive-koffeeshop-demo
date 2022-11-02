@@ -23,7 +23,7 @@ fastify.post('/http', async (request, reply) => {
   const { name, product } = request.body;
   const order = { orderId: nanoid(), customer: name, beverage: product };
   try {
-    const response = await axios.post('http://localhost:8081', order);
+    const response = await axios.post('http://barista-http:8081', order);
     reply.send(response.data);
   } catch (err) {
     reply.send(createFallbackBeverage(order));
@@ -32,7 +32,7 @@ fastify.post('/http', async (request, reply) => {
 
 const kafka = new Kafka({
   clientId: 'koffeeshop-services',
-  brokers: [process.env.KAFKA_BOOTSTRAP_SERVER || 'localhost:9092']
+  brokers: [process.env.KAFKA_BOOTSTRAP_SERVER || 'kafka:9092']
 });
 
 const queue = new EventEmitter();

@@ -1,7 +1,5 @@
 const { pickName, getPreparationTime } = require('../utils/random');
-
 const barista = pickName();
-
 const state = {
   IN_QUEUE: 'IN_QUEUE',
   BEING_PREPARED: 'BEING_PREPARED',

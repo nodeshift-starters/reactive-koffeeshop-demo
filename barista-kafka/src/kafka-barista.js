@@ -10,7 +10,7 @@ const logger = pino({
 
 const kafka = new Kafka({
   clientId: 'barista-kafka-node',
-  brokers: [process.env.KAFKA_BOOTSTRAP_SERVER || 'localhost:9092']
+  brokers: [process.env.KAFKA_BOOTSTRAP_SERVER || 'kafka:9092']
 });
 
 const producer = kafka.producer();
